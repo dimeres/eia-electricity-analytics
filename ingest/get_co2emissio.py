@@ -1,3 +1,4 @@
+
 import os
 import json
 import pathlib
@@ -22,7 +23,7 @@ RAW_DIR.mkdir(exist_ok=True)
 CLEAN_DIR.mkdir(exist_ok=True)
 
 
-BASE_URL = "https://api.eia.gov/v2/electricity/retail-sales/data/"
+BASE_URL = "https://api.eia.gov/v2/co2-emissions/co2-emissions-aggregates/data/"
 
 
 # 50 states + DC
@@ -51,8 +52,8 @@ def fetch_all_pages(start="2010-01", end=None):
     while True:
         params = {
             "api_key": API_KEY,
-            "frequency": "monthly",
-            "data[]": ["customers", "price", "revenue", "sales"],
+            "frequency": "annual",
+            "data[]": ["value"],
             "start": start,
             "end": end,
             "offset": offset,
@@ -75,20 +76,20 @@ def fetch_all_pages(start="2010-01", end=None):
     return all_records
 
 
-def ingest_retail_sales():
+def ingest_co2():
     records = fetch_all_pages()
 
-    raw_path = RAW_DIR / f"retail_sales_raw_{datetime.today().strftime('%Y%m%d')}.json"
+    raw_path = RAW_DIR / f"emissions_raw_{datetime.today().strftime('%Y%m%d')}.json"
     with raw_path.open("w") as f:
         json.dump(records, f, indent=2)
 
     df = pd.DataFrame(records)
     df["period"] = pd.to_datetime(df["period"], errors="raise")
 
-    df = df[df["stateid"].isin(STATE_IDS)]
+    df = df[df["stateId"].isin(STATE_IDS)]
 
     # Convert raw records into a tabular structure
-    clean_path = CLEAN_DIR / "retail_sales_clean.csv"
+    clean_path = CLEAN_DIR / "emissions_clean.csv"
     df.to_csv(clean_path, index=False)
 
     print(f"Downloaded Total Raw {len(records)} rows.")
@@ -98,4 +99,4 @@ def ingest_retail_sales():
 
 
 if __name__ == "__main__":
-    ingest_retail_sales()
+    ingest_co2()
