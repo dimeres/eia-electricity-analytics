@@ -2,14 +2,10 @@
 # virtual environment
 venv/
 
-# environment variables
+# API credentials
 .env
 
-# raw API data (large, unnecessary for GitHub)
 data_raw/
-
-# optional: ignore clean CSVs
-# comment this out if you want to push them
 data_clean/
 
 # macOS metadata
