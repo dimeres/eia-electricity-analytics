@@ -20,7 +20,7 @@ cleaned as (
         trim(sectorName) as sector_name,
         fuelid as fuel_code,
         trim(fuelName) as fuel_desc,
-        coalesce(value, 0) as emissions_milion_tons
+        coalesce(value, 0) as co2_milion_tons
 
     from source
 
