@@ -23,24 +23,10 @@ cleaned as (
         -- in valid sectors should be treated as 0.
         coalesce(customers, 0) as customer_count,
         coalesce(revenue, 0) as revenue_mil_usd,
-        coalesce(sales, 0) as sales_mwh,
+        -- Raw Unit = 'million kilowatt hours'
+        -- 1 Million kWh = 1 GWh
+        coalesce(sales, 0) as sales_gwh,
         price as price_cents_kwh, -- Keep NULL for accurate averages
-
-        -- 4. Units (Shortened)
-        case 
-            when customers_units = 'number of customers' then '#'
-            else customers_units
-        end as customer_unit_label,
-
-        case 
-            when revenue_units = 'million dollars' then 'M USD'
-            else revenue_units
-        end as revenue_unit_label,
-
-        case 
-            when sales_units = 'million kilowatt hours' then 'MWh'
-            else sales_units
-        end as sales_unit_label
 
     from source
     
@@ -51,5 +37,8 @@ cleaned as (
 
 select * from cleaned
 
--- DEDUPLICATION
+/* DEDUPLICATION SAFETY NET:
+  If the automation script accidentally loads the same data twice 
+  this Window Function keeps only the first record per ID and filters out the duplicates. */
 qualify row_number() over (partition by retail_sales_id order by report_date) = 1
+
