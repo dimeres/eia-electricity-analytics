@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: eia_raw
+    database: EIA_DB
+    schema: RAW
+    tables:
+      - name: RETAIL_SALES
+      - name: GENERATION
+      - name: CO2_EMISSIONS
