@@ -25,7 +25,7 @@ cleaned as (
     from source
 
     WHERE 
-        fuelid not in ('TOT', 'ALL')
+        fuelid not in ('TO', 'ALL', 'TOT')
         AND sectorid != 'ALL'
 )
 
