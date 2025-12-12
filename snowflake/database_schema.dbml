@@ -1,0 +1,90 @@
+// ==============================================
+// US Energy Market Data Warehouse Schema
+// ==============================================
+
+// ----------------------------------------------
+// DIMENSIONS (The Nouns)
+// ----------------------------------------------
+
+Table DIM_DATE {
+  DATE_ID date [primary key]
+  YEAR_INT number
+  YEAR_START date
+  QUARTER_INT number
+  QUARTER_NAME varchar
+  MONTH_INT number
+  MONTH_NAME_SHORT varchar
+  MONTH_NAME_FULL varchar
+  MONTH_START date
+  DAY_OF_WEEK_NUM number
+  DAY_OF_WEEK_NAME varchar
+  IS_WEEKEND boolean
+}
+
+Table DIM_FUEL {
+  FUEL_ID varchar [primary key]
+  FUEL_DESCRIPTION varchar
+  FUEL_UNIT varchar
+  CO2_GROUP_CODE varchar [note: 'Bridge Column to Emissions']
+  FUEL_CATEGORY_DESC varchar
+}
+
+Table DIM_STATES {
+  STATE_ID varchar [primary key]
+  STATE_NAME varchar
+}
+
+// ----------------------------------------------
+// FACT TABLES (The Verbs)
+// ----------------------------------------------
+
+Table FCT_ANNUAL_EMISSIONS {
+  DATE_ID date [note: 'Anchored to Jan 1st']
+  STATE_ID varchar
+  SECTOR_CODE varchar
+  SECTOR_NAME varchar
+  CO2_GROUP_CODE varchar [note: 'Links to DIM_FUEL Bridge']
+  CO2_MILION_TONS float
+}
+
+Table FCT_MONTHLY_GENERATION {
+  DATE_ID date
+  STATE_ID varchar
+  FUEL_ID varchar
+  GENERATION_GWH float
+  CONSUMPTION_FUEL_THOUSANDS float
+  CONSUMPTION_MILLION_MMBTU float
+  HEAT_RATE_MMBTU_PER_GWH float
+}
+
+Table FCT_MONTHLY_SALES {
+  DATE_ID date
+  STATE_ID varchar
+  SECTOR_ID varchar
+  SECTOR_NAME varchar
+  REVENUE_MIL_USD float
+  SALES_GWH float
+  CUSTOMER_COUNT float
+  PRICE_CENTS_KWH float
+}
+
+// ----------------------------------------------
+// RELATIONSHIPS (The Joins)
+// ----------------------------------------------
+
+// 1. Generation Relationships (The most detailed fact)
+Ref: FCT_MONTHLY_GENERATION.DATE_ID > DIM_DATE.DATE_ID
+Ref: FCT_MONTHLY_GENERATION.STATE_ID > DIM_STATES.STATE_ID
+Ref: FCT_MONTHLY_GENERATION.FUEL_ID > DIM_FUEL.FUEL_ID
+
+// 2. Sales Relationships
+Ref: FCT_MONTHLY_SALES.DATE_ID > DIM_DATE.DATE_ID
+Ref: FCT_MONTHLY_SALES.STATE_ID > DIM_STATES.STATE_ID
+
+// 3. Emissions Relationships
+Ref: FCT_ANNUAL_EMISSIONS.DATE_ID > DIM_DATE.DATE_ID
+Ref: FCT_ANNUAL_EMISSIONS.STATE_ID > DIM_STATES.STATE_ID
+
+// 4. The Bridge Relationship (The special link)
+// This links Annual Emissions (Broad Group) to the Fuel Dimension (Broad Group)
+Ref: FCT_ANNUAL_EMISSIONS.CO2_GROUP_CODE > DIM_FUEL.CO2_GROUP_CODE
