@@ -26,7 +26,7 @@ cleaned as (
         -- Raw Unit = 'million kilowatt hours'
         -- 1 Million kWh = 1 GWh
         coalesce(sales, 0) as sales_gwh,
-        price as price_cents_kwh, -- Keep NULL for accurate averages
+        price as price_cents_kwh -- Keep NULL for accurate averages
 
     from source
     
