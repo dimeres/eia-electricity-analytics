@@ -13,14 +13,11 @@ cleaned as (
         )) as emission_id,
 
         -- 2. Standardize
-        period as report_date,
+        year(period) as report_year,
         stateid as state_code,
         trim(statename) as state_name,
         sectorid as sector_code,
         trim(sectorName) as sector_name,
-        fuelid as fuel_code,
-        trim(fuelName) as fuel_desc,
-        coalesce(value, 0) as co2_milion_tons
 
         -- FUEL MAPPING:
         -- We map CO2 codes to match the Generation dataset codes.
@@ -30,11 +27,14 @@ cleaned as (
             else fuelid                    -- Keep 'NG' as 'NG'
         end as fuel_code,
 
+        trim(fuelName) as fuel_desc,
+        coalesce(value, 0) as co2_milion_tons
+
     from source
 
     WHERE 
         fuelid not in ('TO', 'ALL', 'TOT')
-        AND sectorid != 'ALL'
+        AND sectorid != 'TT'
 )
 
 select * from cleaned

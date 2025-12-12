@@ -1,5 +1,5 @@
-{% docs retail_sales_cleaning %}
-### 🧹 Transformation Logic: Retail Sales
+
+### Transformation Logic: Retail Sales
 **Goal:** Standardize EIA Retail Sales data for cross-state comparison.
 
 **Key Cleaning Decisions:**
@@ -10,10 +10,10 @@
     * Renamed `revenue` → `revenue_mil_usd`.
     * *Outcome:* Dropped 4 redundant metadata columns (`..._units`) to reduce table width.
 3.  **Null Handling:** Coalesced numeric metrics to 0 (except Price) to ensure accurate summation in dashboards.
-{% enddocs %}
 
-{% docs generation_cleaning %}
-### 🧹 Transformation Logic: Generation
+
+  
+### Transformation Logic: Generation
 **Goal:** Align disparate fuel units into a common comparison metric (GWh).
 
 **Key Cleaning Decisions:**
@@ -25,10 +25,10 @@
 3.  **Variable Units:**
     * Kept `consumption_unit_label` because input fuels vary (Tons vs Barrels).
     * Renamed `consumption` → `consumption_fuel_thousands` for clarity.
-{% enddocs %}
 
-{% docs emissions_cleaning %}
-### 🧹 Transformation Logic: CO2 Emissions
+
+
+### Transformation Logic: CO2 Emissions
 **Goal:** Prepare emissions data for efficiency calculations (Revenue / CO2).
 
 **Key Cleaning Decisions:**
@@ -36,4 +36,3 @@
     * Filtered out 'TOT' (Total Fuels) and 'ALL' (Total Sectors).
     * *Reason:* We need granular data to calculate emissions per specific fuel source.
 2.  **Renaming:** Changed generic `value` column to `emissions_million_metric_tons` for immediate user clarity without needing a separate unit column.
-{% enddocs %}
