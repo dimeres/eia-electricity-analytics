@@ -3,7 +3,7 @@ select
     report_date as date_id,
     state_code as state_id,
     sector_code as sector_id,
-    sector_name
+    sector_name,
 
 
     -- METRICS
