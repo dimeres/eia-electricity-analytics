@@ -22,6 +22,14 @@ cleaned as (
         trim(fuelName) as fuel_desc,
         coalesce(value, 0) as co2_milion_tons
 
+        -- FUEL MAPPING:
+        -- We map CO2 codes to match the Generation dataset codes.
+        case 
+            when fuelid = 'CO' then 'COW'  -- Map 'Coal' to 'All Coal Products'
+            when fuelid = 'PE' then 'PET'  -- Map 'Petroleum' to 'Petroleum'
+            else fuelid                    -- Keep 'NG' as 'NG'
+        end as fuel_code,
+
     from source
 
     WHERE 
