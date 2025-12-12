@@ -24,7 +24,6 @@ cleaned as (
         -- 4. Consumption (The Fix)
         coalesce(consumption_for_eg, 0) as consumption_fuel_thousands,
         
-        -- The Label: "What specific unit is that number?"
         case 
             when consumption_for_eg_units = 'thousand Mcf' then 'Mcf'
             when consumption_for_eg_units = 'thousand barrels' then 'Barrels'
@@ -39,8 +38,19 @@ cleaned as (
     
     WHERE 
         (sectorid = '99' OR sectorid = 'ALL') 
-        AND fuelTypeid not in ('ALL', 'TOT', 'AFL')
+      
+        AND fuelTypeid not in (
+            'ALL', 'TOT', 'AFL', -- total fuels 
+            'FOS', 'AOR', 'REN', 'TSN', 'TPV', 'SUN', 'WND', 'OOG', 'ORW',
+        
+            'COL', -- Coal Excl Waste (Duplicate of BIT+LIG+SUB)
+            'COW', -- All Coal (Duplicate of Everything)
+            'PEL', -- Petroleum Liquids (Duplicate of DFO+RFO)
+            'PET', -- Petroleum (Duplicate of DFO+RFO+PC)
+            'NGO'  -- Natural Gas & Others (Duplicate of NG)
+        )
 )
+
 
 select * from cleaned
 
