@@ -1,0 +1,63 @@
+version: 2
+
+models:
+
+  # DIMENSIONS
+  
+  - name: dim_date
+    description: "Calendar dimension for date navigation and filtering (Years, Quarters)."
+    columns:
+      - name: date_id
+        tests: [unique, not_null]
+      - name: year_int
+        description: "Year integer (e.g. 2020) for filtering."
+
+  - name: dim_states
+    description: "Lookup table for US States."
+    columns:
+      - name: state_id
+        tests: [unique, not_null]
+      - name: state_name
+        description: "Full state name (e.g. Texas)."
+
+  - name: dim_fuel
+    description: "The 'Bridge' table mapping detailed Generation fuels to broad CO2 groups."
+    columns:
+      - name: fuel_id
+        description: "Granular fuel code (e.g. BIT, LIG) from Generation data."
+        tests: [unique, not_null]
+      - name: co2_group_code
+        description: "Broad category (COW, NG, PET) for linking to Emissions data."
+
+
+  # FACT TABLES 
+
+  - name: fct_monthly_sales
+    description: "Monthly electricity sales and revenue by State."
+    columns:
+      - name: date_id
+        tests: [not_null, relationships: {to: ref('dim_date'), field: date_id}]
+      - name: state_id
+        tests: [not_null, relationships: {to: ref('dim_states'), field: state_id}]
+
+  - name: fct_monthly_generation
+    description: "Monthly electricity generation and fuel consumption by State and Fuel."
+    columns:
+      - name: date_id
+        tests: [not_null, relationships: {to: ref('dim_date'), field: date_id}]
+      - name: state_id
+        tests: [not_null, relationships: {to: ref('dim_states'), field: state_id}]
+      - name: fuel_id
+        tests: [not_null, relationships: {to: ref('dim_fuel'), field: fuel_id}]
+
+  - name: fct_annual_emissions
+    description: "Annual CO2 emissions by State and Fuel Group."
+    columns:
+      - name: date_id
+        description: "Anchored to Jan 1st of the report year."
+        tests: [not_null, relationships: {to: ref('dim_date'), field: date_id}]
+      - name: state_id
+        tests: [not_null, relationships: {to: ref('dim_states'), field: state_id}]
+      - name: co2_group_code
+        description: "Links to the co2_group_code column in dim_fuel."
+        tests: [not_null]

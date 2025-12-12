@@ -40,4 +40,4 @@ cleaned as (
 select * from cleaned
 
 -- DEDUPLICATION SAFETY NET
-qualify row_number() over (partition by emission_id order by report_date) = 1
+qualify row_number() over (partition by emission_id order by report_year) = 1
